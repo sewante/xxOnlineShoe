@@ -13,7 +13,9 @@ class OnlinePayment extends CI_Controller {
 
 		// load the GTPay payment library
 		include APPPATH.'third_party/GTPayConnector.php';
-		// initialize some data variables
+
+		//load models
+		$this->load->model("transactions");
 	}
 
 	/**
@@ -27,7 +29,7 @@ class OnlinePayment extends CI_Controller {
 		$message = "success";
 
 		// check if the payer's name has been provided
-		$customerName = $_POST['gtp_PayerName'];
+		$customerName = $this->input->post('gtp_PayerName'); //$_POST['gtp_PayerName'];
 		if(($customerName == "") || ($customerName == null)) {
 			$message = "Provide Your name please!";
 			return $message;
@@ -44,12 +46,12 @@ class OnlinePayment extends CI_Controller {
 	public function handlePost() {
 
 		$data["msg"] = "";
-		$data["shoename"] = $_POST['gtp_TransDetails'];
-		$data["shoeimagePath"] = $_POST['shoeimage'];
-		$data["shoeprice"] = $_POST['gtp_Amount'];
-		$data["currency"] = $_POST['gtp_Currency'];
-		$data["order"] = $_POST['gtp_OrderId'];
-		$data["product"] = $_POST['gtp_TransDetails'];
+		$data["shoename"] = $this->input->post('gtp_TransDetails');
+		$data["shoeimagePath"] = $this->input->post('shoeimage');
+		$data["shoeprice"] = $this->input->post('gtp_Amount');
+		$data["currency"] = $this->input->post('gtp_Currency');
+		$data["order"] = $this->input->post('gtp_OrderId');
+		$data["product"] = $this->input->post('gtp_TransDetails');
 
 		$message = $this->validatePostData();
 		if(strcmp($message, "success") != 0) {
@@ -70,13 +72,16 @@ class OnlinePayment extends CI_Controller {
 	*/
 	public function processPayment() {
 
-		//creat the GTPayConnector istance
+		//create the GTPayConnector istance
 		$gtpayConnector = new GTPayConnector();
+
 		// the secret/salt for hashing with SHA256/salt type
-		$secret = "F3BAF2F79EFDD23B6407985EB4AD40DD";//"F3BAF2F79EFDD23B6407985EB4AD40DD";
+		$secret = "F3BAF2F79EFDD23B6407985EB4AD40DD";
 		$marchantcode = "254";
 		$gtpayURL = "http://192.168.2.32/ABGTPAY/GTPAY/GTPay_v2/GTPay.aspx";
 
+		//the transaction log
+		$transactionLog = array();
 
 		// prepare the salt
 		$gtpayConnector->setSalt($secret);
@@ -95,12 +100,21 @@ class OnlinePayment extends CI_Controller {
 			
 			if(strlen($value) > 0) {
 				$gtpayConnector->addTransactionFields($key, $value);
+
+				// add the post data to the transactionLog
+				$transactionLog[$key] = $value;
 			}
 		}
 		//get the date and time when the payment request is made
 		$date = new DateTime();
 		$date->setTimeZone(new DateTimeZone('UTC'));
 		$transactionDate = $date->format('Y-m-d\TH-i-s\Z');
+
+		//add the date of the transaction
+		$transactionLog["transactDate"] = $transactionDate;
+
+		//log the trasaction on your database
+		$this->transactions->logTransaction($transactionLog);
 
 		// set the salt type
 		$gtpayConnector->setSaltType("SHA256");

@@ -25,7 +25,8 @@ class Welcome extends CI_Controller {
 	}
 	public function index()
 	{
-		$this->load->view('partials/header');
+		$data['page_title'] = "xx Online Shoe";
+		$this->load->view('partials/header', $data);
 		$this->load->view('buy-items');
 		$this->load->view('partials/footer');
 	}
@@ -85,7 +86,8 @@ class Welcome extends CI_Controller {
 		}
 
 		//go to specific item
-		$this->load->view('partials/header');
+		$data['page_title'] = "xx Online Shoe | ".$itemName;
+		$this->load->view('partials/header', $data);
 		$this->load->view('item', $data);
 		$this->load->view('partials/footer');
 
