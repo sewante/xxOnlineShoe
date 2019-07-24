@@ -13,10 +13,9 @@
 			<div class="alert alert-danger">
 				<p>
 					<?php 
-						if($responseData != null) {
+						if(($responseData != null) || ($responseData != "")) {
 
 							var_dump($responseData);
-							echo "was not null";
 						}
 						else {
 

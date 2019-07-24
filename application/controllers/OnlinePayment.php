@@ -13,6 +13,7 @@ class OnlinePayment extends CI_Controller {
 
 		// load the GTPay payment library
 		include APPPATH.'third_party/GTPayConnector.php';
+		include APPPATH.'third_party/VpcConfig.php';
 
 		//load models
 		$this->load->model("transactions");
@@ -42,6 +43,7 @@ class OnlinePayment extends CI_Controller {
 
 	/**
 		handle post request
+		collect post data from the form and call processPayment()
 	*/
 	public function handlePost() {
 
@@ -69,22 +71,44 @@ class OnlinePayment extends CI_Controller {
 
 	/**
 		gtpay integration
+		process the payment details and send them to the vpc
 	*/
 	public function processPayment() {
 
-		//create the GTPayConnector istance
+		//create the GTPayConnector instance
 		$gtpayConnector = new GTPayConnector();
 
-		// the secret/salt for hashing with SHA256/salt type
-		$secret = "F3BAF2F79EFDD23B6407985EB4AD40DD";
-		$marchantcode = "254";
-		$gtpayURL = "http://192.168.2.32/ABGTPAY/GTPAY/GTPay_v2/GTPay.aspx";
+		//create the VpcConfig instance
+		$vpcConfig = new VpcConfig();
+
+		//get the vpc xml object
+		$vpcXMLConf = "";
+		$vpcXMLConf  = $vpcConfig->loadVpcConfig();
+
+		// confirm that the configurations of vpc were loaded;
+		if($vpcXMLConf == null) {
+
+			//go to the error interface
+			$data['error_msg'] = "Could not Load the Virtual Payment client Details";
+			$data['page_titile'] = "xxOnline shoe | error";
+			$data['responseData'] = "";
+
+			$this->load->view("error-page", $data);
+			$this->load->view("partials/footer");
+			return;
+		}
+
+		//get the vpc details
+		$vpcUrl = $vpcConfig->getVpcURL($vpcXMLConf);
+		$vpcSalt = $vpcConfig->getVpvSalt($vpcXMLConf);
+		$vpcSaltType = $vpcConfig->getVpcSaltType($vpcXMLConf);
+		$marchantcode = $vpcConfig->getCustomerCode($vpcXMLConf);
 
 		//the transaction log
 		$transactionLog = array();
 
-		// prepare the salt
-		$gtpayConnector->setSalt($secret);
+		// set the salt
+		$gtpayConnector->setSalt($vpcSalt);
 
 		//remove the data that you dont need to send to the payment client
 		unset($_POST['shoeimage']);
@@ -117,21 +141,20 @@ class OnlinePayment extends CI_Controller {
 		$this->transactions->logTransaction($transactionLog);
 
 		// set the salt type
-		$gtpayConnector->setSaltType("SHA256");
+		$gtpayConnector->setSaltType($vpcSaltType);
 
 		// make oneway hash of the Transaction and add it to the digital order
 		$transactionHash = $gtpayConnector->hashAllTransactionData();
 
 		$gtpayConnector->addTransactionFields("gtp_TransDate", $transactionDate);
 		$gtpayConnector->addTransactionFields("gtp_SecureHash", $transactionHash);
-		$gtpayConnector->addTransactionFields("gtp_SecureHashType", "SHA256");
+		$gtpayConnector->addTransactionFields("gtp_SecureHashType", $vpcSaltType);
 
 		//obtain the redirection url
-		$gtpayURL = $gtpayConnector->getDigitalOrderURL($gtpayURL);
+		$vpcUrl = $gtpayConnector->getDigitalOrderURL($vpcUrl);
 
 		// send the payment request
-		header("Location: ".$gtpayURL);
-
+		header("Location: ".$vpcUrl);
 	}
 
 }

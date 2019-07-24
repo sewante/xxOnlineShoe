@@ -51,7 +51,7 @@ class GTPayConnector {
 		// trim at &
 		$this->hashInput = rtrim($this->hashInput, "&");
 		
-		return strtoupper(hash_hmac("SHA256", $this->hashInput.$this->saltType, pack("H*",$this->salt)));
+		return strtoupper(hash_hmac($this->saltType, $this->hashInput.$this->saltType, pack("H*",$this->salt)));
 	}
 
 	/* Get the digital order / url with all the data */

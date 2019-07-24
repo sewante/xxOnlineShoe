@@ -2,15 +2,18 @@
 defined("BASEPATH") OR exit("No direct script access is allowed!");
 
 include APPPATH.'third_party/GTPayConnector.php';
+include APPPATH.'third_party/VpcConfig.php';
 
 class UpdateTransaction extends CI_Controller {
 	// load the GTPay payment library
 	protected $gtPayConnector;
+	protected $vpcConfig;
 
 	public function __construct() {
 
 		parent::__construct();
 		$this->gtPayConnector = new GTPayConnector();
+		$this->vpcConfig = new VpcConfig();
 
 		// load the helpers
 		$this->load->helper('url');
@@ -25,18 +28,30 @@ class UpdateTransaction extends CI_Controller {
 	*/
 	public function doTransactionUpdate() {
 
-		//$gtPayConnector = new GTPayConnector();
+		//get the vpc xml object
+		$vpcXMLConf = "";
+		$vpcXMLConf  = $this->vpcConfig->loadVpcConfig();
 
-		//var_dump($gtPayConnector);
-		//the salt for hashing the SHA256
-		$secret = "F3BAF2F79EFDD23B6407985EB4AD40DD";
+		// confirm that the configurations of vpc were loaded;
+		if($vpcXMLConf == null) {
 
-		//set the secret
-		$this->gtPayConnector->setSalt($secret);
-		$this->gtPayConnector->setSaltType("SHA256");
+			//go to the error interface
+			$data['error_msg'] = "Could not Load the Virtual Payment client Details";
+			$data['page_titile'] = "xxOnline shoe | error";
+			$data['responseData'] = "";
 
-		//set the data recieved via GET
-		//ksort($_GET);
+			$this->load->view("error-page", $data);
+			$this->load->view("partials/footer");
+			return;
+		}
+
+		//get the vpc details
+		$vpcSalt = $this->vpcConfig->getVpvSalt($vpcXMLConf);
+		$vpcSaltType = $this->vpcConfig->getVpcSaltType($vpcXMLConf);
+
+		//set the salt and the salt type
+		$this->gtPayConnector->setSalt($vpcSalt);
+		$this->gtPayConnector->setSaltType($vpcSaltType);
 
 		// get the jason response from the gtpay payment gateway
 		$reply = file_get_contents('php://input');
@@ -62,7 +77,7 @@ class UpdateTransaction extends CI_Controller {
 		$receivedHash = array_key_exists("secure_hash", $replyData) ? $replyData['secure_hash'] : "";
 		//hash the received data
 		$secureHash = $this->gtPayConnector->hashAllTransactionData();
-		
+
 
 		$responseDt = null;
 		//compare if the two hashes are the same
