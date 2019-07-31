@@ -19,12 +19,16 @@ class UpdateTransaction extends CI_Controller {
 		$this->load->helper('url');
 	}
 
+	/**
+		Method called by default when the controller is invoked
+		it call the doTransactionUpdate method, to update the transaction
+	*/
 	public function index() {
 		$this->doTransactionUpdate();
 	}
 
 	/**
-		* method to receive the response from the gtpay payment gateway so as to update our db about the status of the transaction
+		Method to receive the response from the gtpay payment gateway so as to update our db about the status of the transaction
 	*/
 	public function doTransactionUpdate() {
 

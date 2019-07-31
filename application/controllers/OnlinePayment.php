@@ -58,8 +58,9 @@ class OnlinePayment extends CI_Controller {
 		$message = $this->validatePostData();
 		if(strcmp($message, "success") != 0) {
 			$data["msg"] = $message;
+			$data['page_title'] = "xxOnline shoe | error";
 
-			$this->load->view('partials/header');
+			$this->load->view('partials/header', $data);
 			$this->load->view('item', $data);
 			$this->load->view('partials/footer');
 		}
