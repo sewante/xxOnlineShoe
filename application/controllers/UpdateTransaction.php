@@ -105,10 +105,10 @@ class UpdateTransaction extends CI_Controller {
 			$responseDt['transId'] = $replyData['transaction_id'];
 
 			$data['responseData'] = $responseDt;
-			var_dump($data);
+			//var_dump($data);
 
-			//$this->load->view("error-page", $data);
-			//$this->load->view("partials/footer");
+			$this->load->view("error-page", $data);
+			$this->load->view("partials/footer");
 		}
 	}
 }
