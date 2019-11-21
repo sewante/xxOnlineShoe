@@ -2,7 +2,7 @@
 defined("BASEPATH") OR exit("No direct script access is allowed!");
 
 /**
-	This file stablishes connection nto the GTPay payment service
+	*This file stablishes connection nto the GTPay payment service
 */
 class GtPayConnector {
 

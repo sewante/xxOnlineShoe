@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access is allowed!');
 
 /**
-	File handles online payment using the GTPay online payment third party
+	*File handles online payment using the GTPay online payment third party
 */
 class OnlinePayment extends CI_Controller {
 
@@ -20,11 +20,11 @@ class OnlinePayment extends CI_Controller {
 	}
 
 	/**
-		generate orderID
+		*generate orderID
 	*/
 
 	/**
-		Validate Post data
+		*Validate Post data
 	*/
 	public function validatePostData () {
 		$message = "success";
@@ -42,8 +42,8 @@ class OnlinePayment extends CI_Controller {
 	}
 
 	/**
-		handle post request
-		collect post data from the form and call processPayment()
+		*handle post request
+		*collect post data from the form and call processPayment()
 	*/
 	public function handlePost() {
 
@@ -71,8 +71,8 @@ class OnlinePayment extends CI_Controller {
 	}
 
 	/**
-		gtpay integration
-		process the payment details and send them to the vpc
+		*gtpay integration
+		*process the payment details and send them to the vpc
 	*/
 	public function processPayment() {
 

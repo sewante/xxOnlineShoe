@@ -19,8 +19,8 @@ class VpcConfig {
 	}
 
 	/**
-		Method to process the vpcConfig.xml file
-		@return vpcXMLConf : the object representation of the xml configuration file for the vpc
+		*Method to process the vpcConfig.xml file
+		*@return vpcXMLConf : the object representation of the xml configuration file for the vpc
 	*/
 	public function loadVpcConfig() {
 
@@ -35,9 +35,9 @@ class VpcConfig {
 	}
 
 	/**
-		Method to return the vpc url
-		@param vpcXMLConf : the xml object representation of the vpc xml configurations file
-		@return vpcurl : the url of the vpc on to which the transaction (payement details) are posted
+		*Method to return the vpc url
+		*@param vpcXMLConf : the xml object representation of the vpc xml configurations file
+		*@return vpcurl : the url of the vpc on to which the transaction (payement details) are posted
 	*/
 	public function getVpcURL($vpcXMLConf) {
 
@@ -48,9 +48,9 @@ class VpcConfig {
 		return $vpcurl;
 	}
 	/**
-		Method to return the salt type
-		@param vpcXMLConf : the xml object representation of the vpc xml configurations file
-		@return saltType : the type of hashing algorithm used to create the hash the data
+		*Method to return the salt type
+		*@param vpcXMLConf : the xml object representation of the vpc xml configurations file
+		*@return saltType : the type of hashing algorithm used to create the hash the data
 	*/
 	public function getVpcSaltType($vpcXMLConf) {
 
@@ -63,9 +63,9 @@ class VpcConfig {
 	}
 
 	/**
-		Method to return the salt
-		@param vpcXMLConf : the xml object representation of the vpc xml configurations file
-		@return salt : the hash key that is used during hashing and unhashing the data
+		*Method to return the salt
+		*@param vpcXMLConf : the xml object representation of the vpc xml configurations file
+		*@return salt : the hash key that is used during hashing and unhashing the data
 	*/
 	public function getVpvSalt($vpcXMLConf) {
 
@@ -78,9 +78,9 @@ class VpcConfig {
 	}
 
 	/**
-		Method to return the customer code
-		@param vpcXMLConf : the xml object representation of the vpc xml configurations file
-		@return customerCode : the unique identifier for the customer (for identification on the vpc side)
+		*Method to return the customer code
+		*@param vpcXMLConf : the xml object representation of the vpc xml configurations file
+		*@return customerCode : the unique identifier for the customer (for identification on the vpc side)
 	*/
 	public function getCustomerCode($vpcXMLConf) {
 
